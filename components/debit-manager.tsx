@@ -160,11 +160,11 @@ export default function DebitManager({ userName }: DebitManagerProps) {
 
       if (cardError) throw cardError
 
-      if (card.balance < amount) {
+      if (card.balance < totalAmount) {
         throw new Error("Saldo insuficiente")
       }
 
-      const newBalance = card.balance - amount
+      const newBalance = card.balance - totalAmount
 
       // Update card balance
       const { error: updateError } = await supabase.from("cards").update({ balance: newBalance }).eq("id", cardId)
@@ -177,19 +177,19 @@ export default function DebitManager({ userName }: DebitManagerProps) {
       const { data: teste, error: transactionError } = await supabase.from("transactions").insert({
         card_id: cardId,
         card_name: cardInfo.name,
-        amount: amount,
+        amount: totalAmount,
         type: "debit",
         processed_by: userId,
       })
       console.log("teste:", teste);
 
-      console.log("Transação registrada:", { cardId, amount, userId })
+      console.log("Transação registrada:", { cardId, amount: totalAmount, userId })
 
       if (transactionError) throw transactionError
 
       toast({
         title: "Sucesso",
-        description: `Débito de R$ ${amount.toFixed(2)} registrado com sucesso`,
+        description: `Débito de R$ ${totalAmount.toFixed(2)} registrado com sucesso`,
       })
 
       // Refresh card info

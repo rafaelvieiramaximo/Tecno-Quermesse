@@ -88,7 +88,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://tecno-quermesse-gp.vercel.app/api/login-booth", {
+      const response = await fetch(`${process.env.NEXT_APP_URL}/api/login-booth`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
