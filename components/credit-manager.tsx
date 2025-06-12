@@ -148,22 +148,34 @@ export default function CreditManager({ userId }: CreditManagerProps) {
       // Update card balance
       const { error: updateError } = await supabase.from("cards").update({ balance: newBalance }).eq("id", cardId)
 
-      if (updateError) throw updateError
+      if (!updateError){
+        console.log("Erro: ", updateError);
+      }else{
+        return(
+          <div>
+            <Alert className="bg-green-50 text-green-800">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>Saldo adicionado com sucesso</AlertDescription>
+            </Alert>
+          </div>
+        )
+      }
 
-      // Record transaction
-      const { error: transactionError } = await supabase.from("transactions").insert({
-        card_id: cardId,
-        card_name: cardInfo.name,
-        amount,
-        type: "credit",
-        processed_by: "caixa",
-      })
-      if (transactionError) throw transactionError
 
-      toast({
-        title: "Sucesso",
-        description: `Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`,
-      })
+      // // Record transaction
+      // const { error: transactionError } = await supabase.from("transactions").insert({
+      //   card_id: cardId,
+      //   card_name: cardInfo.name,
+      //   amount,
+      //   type: "credit",
+      //   processed_by: "caixa",
+      // })
+      // if (transactionError) throw transactionError
+
+      // toast({
+      //   title: "Sucesso",
+      //   description: `Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`,
+      // })
 
       // Refresh card info
       fetchCardInfo(cardId)
@@ -364,7 +376,7 @@ export default function CreditManager({ userId }: CreditManagerProps) {
           )}
 
           <Button
-            onClick={() => {handleDebitCredit().then(() => {if (!loading) {window.location.reload()}})}}
+            onClick={() => {handleDebitCredit()}}//.then(() => {if (!loading) {window.location.reload()}})
             disabled= {loading || !cardInfo || amount <= 0}
             className="w-full"
             size="lg"

@@ -88,7 +88,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_APP_URL}/api/login-booth`, {
+      const response = await fetch(`http:localhost:3000/api/login-booth`, {//${process.env.NEXT_APP_URL}
         method: "POST",
         headers: {
           "Content-Type": "application/json",
