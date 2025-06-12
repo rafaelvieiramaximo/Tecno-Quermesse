@@ -136,7 +136,7 @@ export default function DebitManager({ userName }: DebitManagerProps) {
     }
   }
 
-  const handleDebitCredit = async () => {
+  const handleDebit = async () => {
     if (!cardId) {
       toast({
         title: "Erro",
@@ -175,10 +175,10 @@ export default function DebitManager({ userName }: DebitManagerProps) {
         throw updateError
       } else {
         setSuccessMessage(`Saldo debitado com sucesso: R$ ${totalAmount}. Novo saldo: R$ ${newBalance.toFixed(2)}`)
-        setTimeout(() => {
-          setSuccessMessage("")
-          window.location.reload()
-        }, 2000)//cerca de 2 segundos
+        setTimeout(() => setSuccessMessage(""), 2000) // Clear message after 5 seconds
+        setCardId("")
+        setCardInfo(null)
+        setItemQuantities({})
       }
 
       // Record transaction
@@ -189,9 +189,6 @@ export default function DebitManager({ userName }: DebitManagerProps) {
         type: "debit",
         processed_by: userId,
       })
-      console.log("teste:", teste);
-
-      console.log("Transação registrada:", { cardId, amount: totalAmount, userId })
 
       if (transactionError) throw transactionError
 
@@ -428,7 +425,7 @@ export default function DebitManager({ userName }: DebitManagerProps) {
             </Alert>
           )}
           <div className="flex justify-center">
-            <Button className="flex-1 max-w-xs" onClick={handleDebitCredit} disabled={loading || totalAmount <= 0 || !cardInfo}>
+            <Button className="flex-1 max-w-xs" onClick={handleDebit} disabled={loading || totalAmount <= 0 || !cardInfo}>
               Registrar Débito
             </Button>
           </div>
