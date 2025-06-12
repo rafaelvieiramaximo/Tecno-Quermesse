@@ -33,6 +33,7 @@ export default function LoginPage() {
   const [stallPassword, setStallPassword] = useState("")
   const { setUserData } = useUserContext()
   const [failMessage, setFailMessage] = useState<string>("")
+  const [failMessageC, setFailMessageC] = useState<string>("")
 
 
   const { name } = useUserContext()
@@ -118,7 +119,7 @@ export default function LoginPage() {
         router.push("/barraca_home");
         router.refresh();
       } else {
-        setFailMessage("Verifique suas credenciais e tente novamente");
+        setFailMessageC("Verifique suas credenciais e tente novamente");
       }
     } catch (error: any) {
       toast({
@@ -262,10 +263,10 @@ export default function LoginPage() {
                   {loading ? "Entrando..." : "Entrar como barraca"}
                 </Button>
               </CardFooter>
-               {failMessage && (
+               {failMessageC && (
                   <Alert className="bg-red-50 border-red-200 text-red-800 mb-2">
                     <XCircle className="h-4 w-4" />
-                    <AlertDescription>{failMessage}</AlertDescription>
+                    <AlertDescription>{failMessageC}</AlertDescription>
                   </Alert>)}
             </form>
           </TabsContent>
