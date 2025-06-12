@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { createClientSupabaseClient } from "@/lib/supabase-pay"
+import { supabase } from "@/lib/supabase-client"
 import { useToast } from "@/components/ui/use-toast"
 import { MinusCircle, Camera, CameraOff, CheckCircle, AlertCircle, User, CreditCard } from "lucide-react"
 import QrScanner from "qr-scanner"
@@ -25,16 +25,18 @@ interface DebitManagerProps {
 }
 
 export default function DebitManager({ userName }: DebitManagerProps) {
-  const { userId, role, username, name } = useUserContext()
+  const { userId, name } = useUserContext()
   const [items, setItems] = useState<ItemType[]>([]);
   const [itemQuantities, setItemQuantities] = useState<{ [itemId: string]: number }>({});
+  const [successMessage, setSuccessMessage] = useState<string>("")
+
 
   const totalAmount = Object.entries(itemQuantities).reduce((acc, [itemId, qty]) => {
     const item = items.find(i => i.id === itemId);
     return item ? acc + item.price * qty : acc;
   }, 0);
 
-  const supabase = createClientSupabaseClient()
+
   const { toast } = useToast()
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
@@ -169,9 +171,15 @@ export default function DebitManager({ userName }: DebitManagerProps) {
       // Update card balance
       const { error: updateError } = await supabase.from("cards").update({ balance: newBalance }).eq("id", cardId)
 
-      if (updateError) throw updateError
-
-      console.log("aaaa:", name);
+      if (updateError) {
+        throw updateError
+      } else {
+        setSuccessMessage(`Saldo debitado com sucesso: R$ ${totalAmount}. Novo saldo: R$ ${newBalance.toFixed(2)}`)
+        setTimeout(() => {
+          setSuccessMessage("")
+          window.location.reload()
+        }, 2000)//cerca de 2 segundos
+      }
 
       // Record transaction
       const { data: teste, error: transactionError } = await supabase.from("transactions").insert({
@@ -413,10 +421,17 @@ export default function DebitManager({ userName }: DebitManagerProps) {
               </div>
             </div>
           )}
-
-          <Button onClick={handleDebitCredit} disabled={loading || totalAmount <= 0 || !cardInfo}>
-            Registrar Débito
-          </Button>
+          {successMessage && (
+            <Alert className="bg-green-50 border-green-200 text-green-800 mb-2">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>{successMessage}</AlertDescription>
+            </Alert>
+          )}
+          <div className="flex justify-center">
+            <Button className="flex-1 max-w-xs" onClick={handleDebitCredit} disabled={loading || totalAmount <= 0 || !cardInfo}>
+              Registrar Débito
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

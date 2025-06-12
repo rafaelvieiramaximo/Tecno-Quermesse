@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { createClientSupabaseClient } from "@/lib/supabase-pay"
+import { supabase } from "@/lib/supabase-client"
 import { useToast } from "@/components/ui/use-toast"
 import { MinusCircle, Camera, CameraOff, CheckCircle, AlertCircle, User, CreditCard, PlusCircle } from "lucide-react"
 import QrScanner from "qr-scanner"
@@ -17,10 +17,10 @@ interface CreditManagerProps {
 }
 
 export default function CreditManager({ userId }: CreditManagerProps) {
-  const supabase = createClientSupabaseClient()
-  const { toast } = useToast()
+  const [successMessage, setSuccessMessage] = useState<string>("")
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
+  const { toast } = useToast();
 
   // Estados existentes
   const [cardId, setCardId] = useState("")
@@ -148,22 +148,31 @@ export default function CreditManager({ userId }: CreditManagerProps) {
       // Update card balance
       const { error: updateError } = await supabase.from("cards").update({ balance: newBalance }).eq("id", cardId)
 
-      if (updateError) throw updateError
+      if (updateError) {
+        throw updateError
+      } else {
+        setSuccessMessage(`Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`)
+        setTimeout(() =>{
+          setSuccessMessage("")
+          window.location.reload()
+        }, 2000)
+      }
 
-      // Record transaction
-      const { error: transactionError } = await supabase.from("transactions").insert({
-        card_id: cardId,
-        card_name: cardInfo.name,
-        amount,
-        type: "credit",
-        processed_by: "caixa",
-      })
-      if (transactionError) throw transactionError
 
-      toast({
-        title: "Sucesso",
-        description: `Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`,
-      })
+      // // Record transaction
+      // const { error: transactionError } = await supabase.from("transactions").insert({
+      //   card_id: cardId,
+      //   card_name: cardInfo.name,
+      //   amount,
+      //   type: "credit",
+      //   processed_by: "caixa",
+      // })
+      // if (transactionError) throw transactionError
+
+      // toast({
+      //   title: "Sucesso",
+      //   description: `Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`,
+      // })
 
       // Refresh card info
       fetchCardInfo(cardId)
@@ -277,16 +286,6 @@ export default function CreditManager({ userId }: CreditManagerProps) {
               )}
             </div>
           </div>
-
-          {lastScannedCode && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center gap-2 text-green-800">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Último código escaneado:</span>
-              </div>
-              <p className="text-sm text-green-700 mt-1 font-mono break-all">{lastScannedCode}</p>
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -362,10 +361,15 @@ export default function CreditManager({ userId }: CreditManagerProps) {
               </div>
             </div>
           )}
-
+          {successMessage && (
+            <Alert className="bg-green-50 border-green-200 text-green-800 mb-2">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>{successMessage}</AlertDescription>
+            </Alert>
+          )}
           <Button
-            onClick={() => {handleDebitCredit().then(() => {if (!loading) {window.location.reload()}})}}
-            disabled= {loading || !cardInfo || amount <= 0}
+            onClick={() => { handleDebitCredit() }}
+            disabled={loading || !cardInfo || amount <= 0}
             className="w-full"
             size="lg"
           >
