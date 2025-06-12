@@ -18,9 +18,10 @@ interface CreditManagerProps {
 
 export default function CreditManager({ userId }: CreditManagerProps) {
   const supabase = createClientSupabaseClient()
-  const { toast } = useToast()
+  const [successMessage, setSuccessMessage] = useState<string>("")
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
+  const { toast } = useToast();
 
   // Estados existentes
   const [cardId, setCardId] = useState("")
@@ -148,17 +149,14 @@ export default function CreditManager({ userId }: CreditManagerProps) {
       // Update card balance
       const { error: updateError } = await supabase.from("cards").update({ balance: newBalance }).eq("id", cardId)
 
-      if (!updateError){
-        console.log("Erro: ", updateError);
-      }else{
-        return(
-          <div>
-            <Alert className="bg-green-50 text-green-800">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>Saldo adicionado com sucesso</AlertDescription>
-            </Alert>
-          </div>
-        )
+      if (updateError) {
+        throw updateError
+      } else {
+        setSuccessMessage(`Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`)
+        setTimeout(() =>{
+          setSuccessMessage("")
+          window.location.reload()
+        }, 2000)
       }
 
 
@@ -374,10 +372,15 @@ export default function CreditManager({ userId }: CreditManagerProps) {
               </div>
             </div>
           )}
-
+          {successMessage && (
+            <Alert className="bg-green-50 border-green-200 text-green-800 mb-2">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>{successMessage}</AlertDescription>
+            </Alert>
+          )}
           <Button
-            onClick={() => {handleDebitCredit()}}//.then(() => {if (!loading) {window.location.reload()}})
-            disabled= {loading || !cardInfo || amount <= 0}
+            onClick={() => { handleDebitCredit() }}
+            disabled={loading || !cardInfo || amount <= 0}
             className="w-full"
             size="lg"
           >
