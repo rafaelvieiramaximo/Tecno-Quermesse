@@ -13,12 +13,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
-import { createClientSupabaseClient } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase-client"
 import type { User } from "@supabase/supabase-js"
 
 export function UserNav() {
   const router = useRouter()
-  const supabase = createClientSupabaseClient()
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {

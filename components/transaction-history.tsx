@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { createClientSupabaseClient } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase-client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +16,6 @@ interface TransactionHistoryProps {
 }
 
 export default function TransactionHistory({ userId, userRole }: TransactionHistoryProps) {
-  const supabase = createClientSupabaseClient()
   const [transactions, setTransactions] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState("")

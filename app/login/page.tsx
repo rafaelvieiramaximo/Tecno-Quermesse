@@ -13,7 +13,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createClientSupabaseClient } from "@/lib/supabase-client";
+import { supabase } from "@/lib/supabase-client";
 import {  useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { profile } from "console";
@@ -22,7 +22,6 @@ import { useUserContext } from "@/contexts/userContext";
 export default function LoginPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = createClientSupabaseClient()
   const { toast } = useToast()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -88,7 +87,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(`http:localhost:3000/api/login-booth`, {//${process.env.NEXT_APP_URL}
+      const response = await fetch(`${process.env.NEXT_APP_URL}/api/login-booth`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

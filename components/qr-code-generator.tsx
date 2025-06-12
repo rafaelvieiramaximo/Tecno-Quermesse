@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createClientSupabaseClient } from "@/lib/supabase-client";
+import { supabase } from "@/lib/supabase-client";
 import { useToast } from "@/components/ui/use-toast";
 import { Printer } from "lucide-react";
 import  QRCode  from "qrcode";
@@ -14,7 +14,6 @@ interface QrCodeGeneratorProps {
 }
 
 export default function QrCodeGenerator({ userId }: QrCodeGeneratorProps) {
-  const supabase = createClientSupabaseClient();
   const { toast } = useToast();
   const [name, setName] = useState("");
   const [initialCredit, setInitialCredit] = useState<string>("");

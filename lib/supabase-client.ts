@@ -1,8 +1,11 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-// For client components only (no next/headers dependency)
-export const createClientSupabaseClient = () => {
-  return createClientComponentClient()
+export const supabase = createClientComponentClient<Database>()
+
+type Database = {
+  public: {
+    Tables: Tables
+  }
 }
 
 export type Tables = {
@@ -24,7 +27,7 @@ export type Tables = {
     id: string
     card_id: string
     amount: number
-    type: "credit" | "debit"
+    type: "debit"
     processed_by: string
     created_at: string
   }

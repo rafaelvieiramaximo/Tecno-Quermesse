@@ -8,7 +8,6 @@ import TransactionHistory from "@/components/transaction-history";
 import { useState, useEffect } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import ProductPage from "@/components/products";
-import SearchingQR from "@/components/searching-qr";
 import CreditManager from "@/components/credit-manager";
 
 interface DashboardTabsProps {
@@ -30,7 +29,6 @@ export default function DashboardTabs({
   }, []);
 
   useEffect(() => {
-  console.log("userRole:", userRole);
 }, [userRole]);
 
   if (!mounted) {

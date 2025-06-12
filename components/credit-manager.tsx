@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { createClientSupabaseClient } from "@/lib/supabase-pay"
+import { supabase } from "@/lib/supabase-client"
 import { useToast } from "@/components/ui/use-toast"
 import { MinusCircle, Camera, CameraOff, CheckCircle, AlertCircle, User, CreditCard, PlusCircle } from "lucide-react"
 import QrScanner from "qr-scanner"
@@ -17,7 +17,6 @@ interface CreditManagerProps {
 }
 
 export default function CreditManager({ userId }: CreditManagerProps) {
-  const supabase = createClientSupabaseClient()
   const [successMessage, setSuccessMessage] = useState<string>("")
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
@@ -287,16 +286,6 @@ export default function CreditManager({ userId }: CreditManagerProps) {
               )}
             </div>
           </div>
-
-          {lastScannedCode && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="flex items-center gap-2 text-green-800">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Último código escaneado:</span>
-              </div>
-              <p className="text-sm text-green-700 mt-1 font-mono break-all">{lastScannedCode}</p>
-            </div>
-          )}
         </CardContent>
       </Card>
 
