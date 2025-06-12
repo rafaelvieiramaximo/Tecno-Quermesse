@@ -179,6 +179,7 @@ export default function DebitManager({ userName }: DebitManagerProps) {
         setCardId("")
         setCardInfo(null)
         setItemQuantities({})
+        setCardInfo(null)
       }
 
       // Record transaction
@@ -197,9 +198,6 @@ export default function DebitManager({ userName }: DebitManagerProps) {
         description: `Débito de R$ ${totalAmount.toFixed(2)} registrado com sucesso`,
       })
 
-      // Refresh card info
-      fetchCardInfo(cardId)
-      setAmount(0)
     } catch (error: any) {
       toast({
         title: "Erro",
