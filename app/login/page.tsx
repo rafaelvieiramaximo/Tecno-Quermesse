@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/lib/supabase-client";
-import {  useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { profile } from "console";
 import { useUserContext } from "@/contexts/userContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { XCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,9 +31,11 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false)
   const [stallUser, setStallUser] = useState("")
   const [stallPassword, setStallPassword] = useState("")
-  const {setUserData} = useUserContext()
+  const { setUserData } = useUserContext()
+  const [failMessage, setFailMessage] = useState<string>("")
 
-  const {name} = useUserContext()
+
+  const { name } = useUserContext()
 
   // Check for error in URL
   useEffect(() => {
@@ -71,12 +75,7 @@ export default function LoginPage() {
       router.push("/dashboard");
       router.refresh();
     } catch (error: any) {
-      toast({
-        title: "Erro ao fazer login",
-        description:
-          error.message || "Verifique suas credenciais e tente novamente",
-        variant: "destructive",
-      });
+      setFailMessage(error.message || "Verifique suas credenciais e tente novamente");
     } finally {
       setLoading(false);
     }
@@ -93,8 +92,8 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: stallUser,     // usa o valor do input
-          password: stallPassword, // usa o valor do input
+          username: stallUser,    
+          password: stallPassword, 
         }),
       });
 
@@ -119,7 +118,7 @@ export default function LoginPage() {
         router.push("/barraca_home");
         router.refresh();
       } else {
-        throw new Error("Credenciais inválidas para a barraca");
+        setFailMessage("Verifique suas credenciais e tente novamente");
       }
     } catch (error: any) {
       toast({
@@ -175,8 +174,8 @@ export default function LoginPage() {
         <Tabs defaultValue="login">
           <CardHeader>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-             <TabsTrigger value="barraca">Barraca</TabsTrigger>
+              <TabsTrigger value="login">Caixa</TabsTrigger>
+              <TabsTrigger value="barraca">Barraca</TabsTrigger>
             </TabsList>
             <CardDescription className="pt-4">
               Acesse o sistema de gestão de Quermesses
@@ -226,6 +225,11 @@ export default function LoginPage() {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Entrando..." : "Entrar"}
                 </Button>
+                {failMessage && (
+                  <Alert className="bg-red-50 border-red-200 text-red-800 mb-2">
+                    <XCircle className="h-4 w-4" />
+                    <AlertDescription>{failMessage}</AlertDescription>
+                  </Alert>)}
               </CardFooter>
             </form>
           </TabsContent>
@@ -235,11 +239,11 @@ export default function LoginPage() {
                 <div className="space-y-2">
                   <Label htmlFor="stall-username">Usuário</Label>
                   <Input
-                  id="stall-username"
-                  placeholder="Digite o usuário"
-                  value={stallUser}
-                  onChange={(e) => setStallUser(e.target.value)}
-                  required
+                    id="stall-username"
+                    placeholder="Digite o usuário"
+                    value={stallUser}
+                    onChange={(e) => setStallUser(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -258,6 +262,11 @@ export default function LoginPage() {
                   {loading ? "Entrando..." : "Entrar como barraca"}
                 </Button>
               </CardFooter>
+               {failMessage && (
+                  <Alert className="bg-red-50 border-red-200 text-red-800 mb-2">
+                    <XCircle className="h-4 w-4" />
+                    <AlertDescription>{failMessage}</AlertDescription>
+                  </Alert>)}
             </form>
           </TabsContent>
         </Tabs>

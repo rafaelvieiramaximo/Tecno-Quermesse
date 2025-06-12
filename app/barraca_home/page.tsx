@@ -37,7 +37,7 @@ export default function BarracaPage() {
       <Card className="bg-white/70 backdrop-blur-sm" >
         <CardHeader>
           <div className="flex flex-col gap-3">
-            <h1 className="text-2xl font-bold">Painel da {name}</h1>
+            <h1 className="text-2xl font-bold">Painel {name}</h1>
             <p className="mb-6">Bem-vindo ao painel da sua barraca!</p>
           </div>
         </CardHeader>
