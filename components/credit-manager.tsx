@@ -21,6 +21,8 @@ export default function CreditManager({ userId }: CreditManagerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
   const { toast } = useToast();
+  const [items, setItems] = useState<any[]>([])
+  const [itemQuantities, setItemQuantities] = useState<{ [key: string]: number }>({})
 
   // Estados existentes
   const [cardId, setCardId] = useState("")
@@ -99,6 +101,17 @@ export default function CreditManager({ userId }: CreditManagerProps) {
     }
   }
 
+  useEffect(() => {
+    const fetchItems = async () => {
+      const { data, error } = await supabase
+        .from("items")
+        .select("id, booth_id, name, price")
+      if (!error) setItems(data || [])
+    }
+
+    fetchItems()
+  }, [])
+
   const fetchCardInfo = async (id: string) => {
     if (!id) return
 
@@ -152,7 +165,7 @@ export default function CreditManager({ userId }: CreditManagerProps) {
         throw updateError
       } else {
         setSuccessMessage(`Crédito de R$ ${amount.toFixed(2)} foi registrado com sucesso`)
-        setTimeout(() =>{
+        setTimeout(() => {
           setSuccessMessage("")
           window.location.reload()
         }, 2000)
@@ -330,6 +343,45 @@ export default function CreditManager({ userId }: CreditManagerProps) {
           <CardDescription>Informe o valor a ser creditado no cartão</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {cardInfo && items.length > 0 && (
+            <div className="mb-4">
+              <Label>Selecione os itens para creditar:</Label>
+              <div className="space-y-2 mt-2">
+                {items.map(item => (
+                  <div key={item.id} className="flex items-center justify-between gap-2">
+                    <span>{item.name} <span className="text-xs text-muted-foreground">(R$ {item.price.toFixed(2)})</span></span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="outline"
+                        onClick={() =>
+                          setItemQuantities(q => ({
+                            ...q,
+                            [item.id]: Math.max((q[item.id] || 0) - 1, 0)
+                          }))
+                        }
+                        disabled={loading || (itemQuantities[item.id] || 0) === 0}
+                      >-</Button>
+                      <span className="w-6 text-center">{itemQuantities[item.id] || 0}</span>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="outline"
+                        onClick={() =>
+                          setItemQuantities(q => ({
+                            ...q,
+                            [item.id]: (q[item.id] || 0) + 1
+                          }))
+                        }
+                        disabled={loading}
+                      >+</Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="amount">Valor a Creditar (R$)</Label>
             <Input
